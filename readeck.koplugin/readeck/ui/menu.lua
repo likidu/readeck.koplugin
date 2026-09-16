@@ -40,6 +40,33 @@ function Menu.install(Readeck, deps)
         return is_current_document_readeck_article(self)
     end
 
+    --- Open the configured download folder, closing an open document first.
+    --- Shared by the "Go to download folder" menu entry and third-party
+    --- launchers (SimpleUI/ZenUI quick actions) that call `launch()`.
+    function Readeck:openDownloadFolder()
+        if self:isempty(self.directory) then
+            UIManager:show(InfoMessage:new({
+                text = L("Please configure a download folder first."),
+            }))
+            return
+        end
+        if self.ui and self.ui.document then
+            self.ui:onClose()
+        end
+        if FileManager.instance then
+            FileManager.instance:reinit(self.directory)
+        else
+            FileManager:showFiles(self.directory)
+        end
+    end
+
+    --- Stable entry point for third-party launchers. SimpleUI's and ZenUI's
+    --- plugin pickers discover a conventional `launch` method on
+    --- FileManager-registered plugins; keep this name stable.
+    function Readeck:launch()
+        return self:openDownloadFolder()
+    end
+
     function Readeck:addToMainMenu(menu_items)
         menu_items.readeck = {
             text = L("Readeck"),
@@ -87,20 +114,7 @@ function Menu.install(Readeck, deps)
                             return L("Go to download folder")
                         end,
                         callback = function()
-                            if self:isempty(self.directory) then
-                                UIManager:show(InfoMessage:new({
-                                    text = L("Please configure a download folder first."),
-                                }))
-                                return
-                            end
-                            if self.ui.document then
-                                self.ui:onClose()
-                            end
-                            if FileManager.instance then
-                                FileManager.instance:reinit(self.directory)
-                            else
-                                FileManager:showFiles(self.directory)
-                            end
+                            self:openDownloadFolder()
                         end,
                         enabled_func = function()
                             return not self:isempty(self.directory)

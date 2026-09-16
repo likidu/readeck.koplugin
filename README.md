@@ -124,6 +124,16 @@ By default, remote-deleted highlights are preserved locally and may be restored 
 
 During sync, the plugin can send KOReader's local reading progress below 100% back to Readeck without archiving the article. It also applies newer incomplete Readeck `read_progress` values to KOReader sidecars when articles are downloaded or skipped because they already exist locally. Articles that are being processed by completion actions are handled by the archive/delete flow instead.
 
+### Launching from SimpleUI
+
+If you use [SimpleUI](https://github.com/doctorhetfield-cmd/simpleui.koplugin) as your KOReader home screen, you can pin Readeck to its tab bar or quick-action rows:
+
+1. In SimpleUI, create a quick action (**Quick Actions → Create Quick Action**) with type **Plugin**, and pick **Readeck** from the list
+2. Add the action to a quick-action row or the bottom tab bar
+3. (Optional) To use the Readeck logo as the icon, copy `readeck.svg` from this plugin's `icons/` folder into SimpleUI's custom icon directory (`<KOReader settings dir>/simpleui/custom_icons/`), then select it in the quick action's icon picker
+
+Tapping the action opens your configured download folder — the same behavior as the menu's **Go to download folder** entry, including closing an open document first and prompting you to configure a folder if none is set yet.
+
 ## ⚠️ Notes
 
 * The download directory should be exclusively used by the Readeck plugin; existing files in it may be deleted

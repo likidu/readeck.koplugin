@@ -476,6 +476,119 @@ describe("KOReader smoke", function()
         assert.is_true(texts:find("Sync current article highlights", 1, true) ~= nil)
     end)
 
+    it("launch() opens the download folder for third-party launchers", function()
+        package.path = "./readeck.koplugin/?.lua;" .. package.path
+        install_koreader_stubs()
+
+        local reinit_target
+        package.loaded["apps/filemanager/filemanager"] = nil
+        package.preload["apps/filemanager/filemanager"] = function()
+            return {
+                instance = {
+                    reinit = function(_, path)
+                        reinit_target = path
+                    end,
+                },
+                showFiles = function() end,
+            }
+        end
+
+        local Readeck = dofile("readeck.koplugin/main.lua")
+        local instance = setmetatable({ directory = "/tmp/readeck" }, { __index = Readeck })
+        instance:launch()
+
+        assert.are.equal("/tmp/readeck", reinit_target)
+    end)
+
+    it("launch() closes an open document before showing the download folder", function()
+        package.path = "./readeck.koplugin/?.lua;" .. package.path
+        install_koreader_stubs()
+
+        local closed = false
+        local shown_files
+        package.loaded["apps/filemanager/filemanager"] = nil
+        package.preload["apps/filemanager/filemanager"] = function()
+            return {
+                showFiles = function(_, path)
+                    shown_files = path
+                end,
+            }
+        end
+
+        local Readeck = dofile("readeck.koplugin/main.lua")
+        local instance = setmetatable({
+            directory = "/tmp/readeck",
+            ui = {
+                document = { file = "/tmp/readeck/article.epub" },
+                onClose = function()
+                    closed = true
+                end,
+            },
+        }, { __index = Readeck })
+        instance:launch()
+
+        assert.is_true(closed)
+        assert.are.equal("/tmp/readeck", shown_files)
+    end)
+
+    it("launch() prompts when no download folder is configured", function()
+        package.path = "./readeck.koplugin/?.lua;" .. package.path
+        install_koreader_stubs()
+
+        local shown
+        package.loaded["ui/uimanager"] = nil
+        package.preload["ui/uimanager"] = function()
+            return {
+                show = function(_, widget)
+                    shown = widget
+                end,
+                close = function() end,
+                forceRePaint = function() end,
+                scheduleIn = function(_, delay_or_callback, maybe_callback)
+                    local callback = maybe_callback or delay_or_callback
+                    callback()
+                end,
+                unschedule = function() end,
+            }
+        end
+
+        local Readeck = dofile("readeck.koplugin/main.lua")
+        local instance = setmetatable({ directory = "" }, { __index = Readeck })
+        instance:launch()
+
+        assert.is.truthy(shown)
+        assert.is_true(shown.text:find("Please configure a download folder first.", 1, true) ~= nil)
+    end)
+
+    it("routes the Go to download folder menu entry through the shared launcher", function()
+        package.path = "./readeck.koplugin/?.lua;" .. package.path
+        install_koreader_stubs()
+
+        local reinit_target
+        package.loaded["apps/filemanager/filemanager"] = nil
+        package.preload["apps/filemanager/filemanager"] = function()
+            return {
+                instance = {
+                    reinit = function(_, path)
+                        reinit_target = path
+                    end,
+                },
+                showFiles = function() end,
+            }
+        end
+
+        local Readeck = dofile("readeck.koplugin/main.lua")
+        local menu_items = {}
+        local instance = setmetatable({ directory = "/tmp/readeck", ui = {} }, { __index = Readeck })
+        Readeck.addToMainMenu(instance, menu_items)
+
+        local entry = find_menu_item(menu_items.readeck.sub_item_table_func(), "Go to download folder: /tmp/readeck")
+        assert.is.truthy(entry)
+        entry.callback()
+
+        assert.are.equal("/tmp/readeck", reinit_target)
+    end)
+
     it("fetches article lists through KOReader async HTTP when available", function()
         package.path = "./readeck.koplugin/?.lua;" .. package.path
         install_koreader_stubs()
