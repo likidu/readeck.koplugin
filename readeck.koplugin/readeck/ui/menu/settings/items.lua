@@ -536,6 +536,13 @@ function Items.install(Readeck, deps)
                         end,
                     },
                     {
+                        text = L("Check for updates"),
+                        keep_menu_open = true,
+                        callback = function()
+                            self:checkForUpdates()
+                        end,
+                    },
+                    {
                         text = L("About"),
                         keep_menu_open = true,
                         callback = function()

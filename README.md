@@ -124,6 +124,14 @@ By default, remote-deleted highlights are preserved locally and may be restored 
 
 During sync, the plugin can send KOReader's local reading progress below 100% back to Readeck without archiving the article. It also applies newer incomplete Readeck `read_progress` values to KOReader sidecars when articles are downloaded or skipped because they already exist locally. Articles that are being processed by completion actions are handled by the archive/delete flow instead.
 
+### Updating the Plugin
+
+1. Go to **Main Menu > Readeck > Settings > Help > Check for updates**
+2. If a newer release exists, its notes are shown — choose **Download and install** to update in place (the package is SHA-256 verified, and the previous version is kept as a rollback copy until the next successful start)
+3. Restart KOReader when prompted
+
+If GitHub is unreachable, the download retries through public mirrors automatically.
+
 ### Launching from SimpleUI
 
 If you use [SimpleUI](https://github.com/doctorhetfield-cmd/simpleui.koplugin) as your KOReader home screen, you can pin Readeck to its tab bar or quick-action rows:

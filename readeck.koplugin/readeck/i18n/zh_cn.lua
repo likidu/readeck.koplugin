@@ -232,6 +232,24 @@ Downloads to folder: %1]] ] = [[Readeck 是一个开源稍后读服务。此插�
     ["Help"] = "帮助",
     ["Usage notes"] = "使用说明",
     ["About"] = "关于",
+    ["Check for updates"] = "检查更新",
+    ["Checking for updates…"] = "正在检查更新…",
+    ["Readeck is up to date (v%1)."] = "Readeck 已是最新版本（v%1）。",
+    ["Update check failed:\n%1"] = "检查更新失败：\n%1",
+    ["Unknown error"] = "未知错误",
+    ["No release notes were provided."] = "未提供更新说明。",
+    ["v%1 → v%2"] = "v%1 → v%2",
+    ["Cancel"] = "取消",
+    ["Download and install"] = "下载并安装",
+    ["Installing Readeck v%1…"] = "正在安装 Readeck v%1…",
+    ["Update installation failed:\n%1"] = "更新安装失败：\n%1",
+    [ [[Readeck v%1 was installed.
+
+Restart KOReader to apply the update?]] ] = [[已安装 Readeck v%1。
+
+重启 KOReader 以应用更新？]],
+    ["Restart now"] = "立即重启",
+    ["Later"] = "稍后",
     [ [[Readeck for KOReader
 Version: %1
 License: MIT

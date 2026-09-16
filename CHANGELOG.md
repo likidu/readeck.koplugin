@@ -1,6 +1,31 @@
 # Changelog
 
 
+## v0.1.3 - 2026-09-15
+
+Source: https://github.com/likidu/readeck.koplugin  
+License: MIT
+
+### English
+
+This release adds in-app OTA updates.
+
+#### Added
+
+- Added "Check for updates" to the Help submenu (above About): it checks this repository's GitHub releases, shows the release notes, and can download, SHA-256-verify, and install the update in place, keeping a rollback copy until the next successful start.
+- Release builds now publish a `.sha256` checksum next to the plugin zip, which the updater verifies before installing.
+- Direct GitHub downloads fall back to public mirrors automatically when GitHub is unreachable.
+
+### 中文
+
+本版本新增应用内 OTA 更新。
+
+#### 新增
+
+- 帮助子菜单（“关于”上方）新增“检查更新”：检查本仓库的 GitHub Releases，展示更新说明，并可下载、校验 SHA-256 后原地安装；旧版本会保留为回滚副本，直到下一次成功启动。
+- Release 构建现在会在插件 zip 旁发布 `.sha256` 校验文件，更新器安装前会先校验。
+- GitHub 直连失败时会自动回退到公共镜像下载。
+
 ## v0.1.2 - 2026-09-15
 
 Source: https://github.com/likidu/readeck.koplugin  

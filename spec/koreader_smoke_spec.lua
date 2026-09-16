@@ -146,10 +146,13 @@ local function install_koreader_stubs()
             isOnline = function()
                 return true
             end,
-            runWhenOnline = function(callback)
+            runWhenOnline = function(_, callback)
                 callback()
             end,
         }
+    end
+    package.preload["ui/widget/textviewer"] = function()
+        return widget()
     end
     package.preload["readhistory"] = function()
         return {
@@ -389,7 +392,7 @@ describe("KOReader smoke", function()
     it("loads the plugin class and builds the main menu with KOReader-shaped APIs", function()
         run_menu_smoke()
         local metadata = dofile("readeck.koplugin/_meta.lua")
-        assert.are.equal("0.1.2", metadata.version)
+        assert.are.equal("0.1.3", metadata.version)
     end)
 
     it("shows license and source repository in the About dialog", function()
@@ -425,7 +428,7 @@ describe("KOReader smoke", function()
         instance:showAboutDialog()
 
         assert.is.truthy(shown)
-        assert.is_true(shown.text:find("Version: 0.1.2", 1, true) ~= nil)
+        assert.is_true(shown.text:find("Version: 0.1.3", 1, true) ~= nil)
         assert.is_true(shown.text:find("License: MIT", 1, true) ~= nil)
         assert.is_true(shown.text:find("https://github.com/iceyear/readeck.koplugin", 1, true) ~= nil)
     end)
@@ -587,6 +590,144 @@ describe("KOReader smoke", function()
         entry.callback()
 
         assert.are.equal("/tmp/readeck", reinit_target)
+    end)
+
+    it("lists Check for updates directly above About in the Help menu", function()
+        package.path = "./readeck.koplugin/?.lua;" .. package.path
+        install_koreader_stubs()
+        local Readeck = dofile("readeck.koplugin/main.lua")
+
+        local items = Readeck.buildSettingsMenuItems(stub_instance())
+        local help_item = find_menu_item(items, "Help")
+        assert.is.truthy(help_item)
+
+        local texts = {}
+        for _, entry in ipairs(help_item.sub_item_table) do
+            texts[#texts + 1] = entry.text
+        end
+        assert.are.same({ "Usage notes", "Check for updates", "About" }, texts)
+    end)
+
+    it("Check for updates shows the release notes when a newer release exists", function()
+        package.path = "./readeck.koplugin/?.lua;" .. package.path
+        install_koreader_stubs()
+
+        local fake_release = {
+            version = "9.9.9",
+            archive_url = "https://github.com/likidu/readeck.koplugin/releases/download/v9.9.9/readeck.koplugin-v9.9.9.zip",
+            checksum_url = "https://github.com/likidu/readeck.koplugin/releases/download/v9.9.9/readeck.koplugin-v9.9.9.zip.sha256",
+            archive_size = 2048,
+            notes = "Great new release",
+        }
+        package.preload["readeck.core.updater"] = function()
+            return {
+                compare_versions = function(left, _)
+                    if left == "9.9.9" then
+                        return 1
+                    end
+                    return 0
+                end,
+                new = function()
+                    return {
+                        fetch_release = function()
+                            return fake_release, nil
+                        end,
+                    }
+                end,
+            }
+        end
+
+        local shown = {}
+        for _, module in ipairs({ "ui/uimanager", "ui/widget/textviewer", "ui/widget/infomessage" }) do
+            package.loaded[module] = nil
+        end
+        package.preload["ui/uimanager"] = function()
+            return {
+                show = function(_, widget)
+                    shown[#shown + 1] = widget
+                end,
+                close = function() end,
+                forceRePaint = function() end,
+                scheduleIn = function(_, delay_or_callback, maybe_callback)
+                    local callback = maybe_callback or delay_or_callback
+                    callback()
+                end,
+                unschedule = function() end,
+            }
+        end
+        package.preload["ui/widget/textviewer"] = function()
+            return {
+                new = function(_, options)
+                    return options or {}
+                end,
+            }
+        end
+        package.preload["ui/widget/infomessage"] = function()
+            return {
+                new = function(_, options)
+                    return options or {}
+                end,
+            }
+        end
+
+        local Readeck = dofile("readeck.koplugin/main.lua")
+        local instance = setmetatable({}, { __index = Readeck })
+        instance:checkForUpdates()
+
+        package.preload["readeck.core.updater"] = nil
+        package.loaded["readeck.core.updater"] = nil
+        local viewer = shown[#shown]
+        assert.is.truthy(viewer and viewer.title)
+        assert.are.equal("v0.1.3 → v9.9.9", viewer.title)
+        assert.are.equal("Great new release", viewer.text)
+        assert.are.equal("Download and install", viewer.buttons_table[1][2].text)
+    end)
+
+    it("Check for updates reports an up-to-date plugin", function()
+        package.path = "./readeck.koplugin/?.lua;" .. package.path
+        install_koreader_stubs()
+
+        package.preload["readeck.core.updater"] = function()
+            return {
+                compare_versions = function()
+                    return 0
+                end,
+                new = function()
+                    return {
+                        fetch_release = function()
+                            return { version = "0.1.3", notes = "same" }, nil
+                        end,
+                    }
+                end,
+            }
+        end
+
+        local shown = {}
+        package.loaded["ui/uimanager"] = nil
+        package.preload["ui/uimanager"] = function()
+            return {
+                show = function(_, widget)
+                    shown[#shown + 1] = widget
+                end,
+                close = function() end,
+                forceRePaint = function() end,
+                scheduleIn = function(_, delay_or_callback, maybe_callback)
+                    local callback = maybe_callback or delay_or_callback
+                    callback()
+                end,
+                unschedule = function() end,
+            }
+        end
+
+        local Readeck = dofile("readeck.koplugin/main.lua")
+        local instance = setmetatable({}, { __index = Readeck })
+        instance:checkForUpdates()
+
+        package.preload["readeck.core.updater"] = nil
+        package.loaded["readeck.core.updater"] = nil
+        local last = shown[#shown]
+        assert.is.truthy(last and last.text)
+        assert.is_true(last.text:find("Readeck is up to date (v0.1.3)", 1, true) ~= nil)
     end)
 
     it("fetches article lists through KOReader async HTTP when available", function()

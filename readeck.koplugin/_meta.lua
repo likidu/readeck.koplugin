@@ -5,7 +5,7 @@ end)
 
 return {
     name = "readeck",
-    version = "0.1.2",
+    version = "0.1.3",
     fullname = L("Readeck"),
     description = L([[Synchronises articles with a Readeck server.]]),
 }

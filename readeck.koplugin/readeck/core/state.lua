@@ -188,6 +188,7 @@ function State.install(Readeck, deps)
             self:saveSettings()
         end
         Log:info("Readeck plugin initialization complete")
+        self:cleanupUpdateBackup()
         self:reschedulePeriodicSync()
     end
 end

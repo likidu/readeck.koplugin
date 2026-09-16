@@ -88,6 +88,14 @@ KOReader Readeck 插件允许你将 Readeck 服务器上的文章同步到 KORea
 
 默认策略会保留本地高亮：如果远端 Readeck 删除了某条高亮，但 KOReader 本地仍然存在，下一次同步可能会把它恢复到 Readeck。若希望尊重远端删除，可把 **高亮同步冲突策略** 设置为 **尊重远端删除**；这样关联过远端 ID 的本地高亮会保留在 KOReader，但不会重新上传。
 
+### 更新插件
+
+1. 进入 **主菜单 > Readeck > 设置 > 帮助 > 检查更新**
+2. 如有新版本会显示更新说明，选择 **下载并安装** 即可原地更新（安装包会先校验 SHA-256，旧版本会保留为回滚副本，直到下一次成功启动）
+3. 按提示重启 KOReader
+
+如果无法直连 GitHub，下载会自动通过公共镜像重试。
+
 ### 从 SimpleUI 启动
 
 如果你使用 [SimpleUI](https://github.com/doctorhetfield-cmd/simpleui.koplugin) 作为 KOReader 主界面，可以把 Readeck 加入它的底部栏或快捷操作：

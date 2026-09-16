@@ -23,6 +23,7 @@ local SettingsStorage = require("readeck.storage.settings")
 local SettingsUI = require("readeck.ui.settings")
 local State = require("readeck.core.state")
 local StatusMessages = require("readeck.ui.status_messages")
+local UpdaterUI = require("readeck.ui.updater")
 
 local T = FFIUtil.template
 local L = I18n.with_gettext(_, function()
@@ -47,8 +48,8 @@ local deps = {
     skipped = Defaults.DOWNLOAD_SKIPPED,
     downloaded = Defaults.DOWNLOAD_DONE,
     OAUTH_DEVICE_GRANT = Defaults.OAUTH_DEVICE_GRANT,
-    DEFAULT_OAUTH_SCOPES = Defaults.DEFAULT_OAUTH_SCOPES,
     PLUGIN_VERSION = PluginMetadata.version,
+    PLUGIN_DIR = plugin_dir,
 }
 
 Helpers.install(Readeck, deps)
@@ -65,5 +66,6 @@ Menu.install(Readeck, deps)
 SettingsUI.install(Readeck, deps)
 Events.install(Readeck, deps)
 State.install(Readeck, deps)
+UpdaterUI.install(Readeck, deps)
 
 return Readeck

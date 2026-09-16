@@ -59,13 +59,15 @@ jobs:
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-      - name: Package plugin zip
+      - name: Package plugin zip and checksum
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq zip
           zip_file="readeck.koplugin-v${{ steps.version.outputs.version }}.zip"
           zip -r -X "$zip_file" readeck.koplugin
+          sha256sum "$zip_file" > "$zip_file.sha256"
           unzip -l "$zip_file"
+          cat "$zip_file.sha256"
 
       - name: Extract release notes from CHANGELOG.md
         run: |
@@ -90,7 +92,7 @@ jobs:
           tag="${GITHUB_REF_NAME}"
           version="${{ steps.version.outputs.version }}"
           zip_file="readeck.koplugin-v${version}.zip"
-          gh release create "$tag" "$zip_file" \
+          gh release create "$tag" "$zip_file" "$zip_file.sha256" \
             --title "Readeck KOReader Plugin v${version}" \
             --notes-file release_notes.md
 
@@ -99,4 +101,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: readeck.koplugin-v${{ steps.version.outputs.version }}
-          path: readeck.koplugin-v${{ steps.version.outputs.version }}.zip
+          path: |
+            readeck.koplugin-v${{ steps.version.outputs.version }}.zip
+            readeck.koplugin-v${{ steps.version.outputs.version }}.zip.sha256
