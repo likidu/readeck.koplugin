@@ -1,5 +1,39 @@
 # Changelog
 
+
+## v0.1.2 - 2026-09-15
+
+Source: https://github.com/likidu/readeck.koplugin  
+License: MIT
+
+### English
+
+This release adds third-party launcher support, so the plugin can be pinned to SimpleUI (and ZenUI) quick actions and tab bars.
+
+#### Added
+
+- Added a stable `launch()` entry point that opens the configured download folder; SimpleUI's and ZenUI's plugin pickers discover it by convention (same as `weread.koplugin`).
+- Added the official Readeck logo (`icons/readeck.svg`) for use as a quick-action icon.
+- Added SimpleUI integration instructions to the README (English and Simplified Chinese).
+
+#### Changed
+
+- The "Go to download folder" menu entry and `launch()` now share one code path: an open document is closed first, and a prompt asks you to configure a download folder when none is set yet.
+
+### 中文
+
+本版本新增第三方启动器支持：可以把插件固定到 SimpleUI（以及 ZenUI）的快捷操作和底部栏。
+
+#### 新增
+
+- 新增稳定的 `launch()` 入口：打开已配置的下载文件夹；SimpleUI 和 ZenUI 的插件选择器会按约定自动发现该方法（与 `weread.koplugin` 一致）。
+- 新增 Readeck 官方图标（`icons/readeck.svg`），可用作快捷操作图标。
+- README（英文 / 简体中文）新增 SimpleUI 集成说明。
+
+#### 变更
+
+- 菜单中“前往下载文件夹”与 `launch()` 共用同一实现：先关闭正在阅读的文档再打开文件夹；尚未配置下载目录时会提示先配置。
+
 ## v0.1.1 - 2026-05-07
 
 Source: https://github.com/iceyear/readeck.koplugin  
